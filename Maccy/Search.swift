@@ -36,14 +36,14 @@ class Search {
     var text: String
 
     init(from raw: String) {
-      var parts = raw.split(separator: " ", omittingEmptySubsequences: true).map(String.init)
-      if let tagPart = parts.first, tagPart.hasPrefix("#") {
-        self.tag = String(tagPart.dropFirst())
-        parts.removeFirst()
+      if let match = raw.range(of: #"^\s*#(\S*)(?:\s|$)"#, options: .regularExpression) {
+        let matchedString = raw[match]
+        self.tag = String(matchedString.trimmingCharacters(in: .whitespaces).dropFirst())
+        self.text = String(raw[match.upperBound...])
       } else {
         self.tag = nil
+        self.text = raw
       }
-      self.text = parts.joined(separator: " ")
     }
   }
 

@@ -11,6 +11,30 @@ class SearchTests: XCTestCase {
     Defaults[.searchMode] = savedSearchMode
   }
 
+  func testParsedQuery() {
+    // "#kod docker" -> tag: "kod", text: "docker"
+    let q1 = Search.ParsedQuery(from: "#kod docker")
+    XCTAssertEqual(q1.tag, "kod")
+    XCTAssertEqual(q1.text, "docker")
+
+    // "#" (tek başına) -> tag: "", text: ""
+    let q2 = Search.ParsedQuery(from: "#")
+    XCTAssertEqual(q2.tag, "")
+    XCTAssertEqual(q2.text, "")
+
+    // "docker" -> tag: nil, text: "docker"
+    let q3 = Search.ParsedQuery(from: "docker")
+    XCTAssertNil(q3.tag)
+    XCTAssertEqual(q3.text, "docker")
+
+    // Büyük/küçük harf durumu init kısmında dropFirst() ile alınıyor
+    // Arama kısmında lowercased() ile kullanılmıştı.
+    // Parse edilen string doğrudan "#İŞ" -> "İŞ" olmalıdır.
+    let q4 = Search.ParsedQuery(from: "#İŞ")
+    XCTAssertEqual(q4.tag, "İŞ")
+    XCTAssertEqual(q4.text, "")
+  }
+
   @MainActor
   func testSimpleSearch() { // swiftlint:disable:this function_body_length
     Defaults[.searchMode] = Search.Mode.exact

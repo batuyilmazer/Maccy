@@ -123,8 +123,9 @@ struct PinTagView: View {
 
   var body: some View {
     TextField(
-      Text("TagPlaceholder", tableName: "PinsSettings"),
-      text: $tagText
+      "",
+      text: $tagText,
+      prompt: Text("TagPlaceholder", tableName: "PinsSettings")
     )
     .onSubmit { commitTags() }
     .onChange(of: tagText) { _, _ in commitTags() }
