@@ -52,6 +52,7 @@ class HistoryItemDecorator: Identifiable, Hashable, HasVisibility {
 
   var isPinned: Bool { item.pin != nil }
   var isUnpinned: Bool { item.pin == nil }
+  var tags: [String] { item.tags }
 
   func hash(into hasher: inout Hasher) {
     // We need to hash title and attributedTitle, so SwiftUI knows it needs to update the view if they chage
