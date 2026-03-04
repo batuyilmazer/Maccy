@@ -17,7 +17,7 @@ class SearchTests: XCTestCase {
     XCTAssertEqual(q1.tag, "kod")
     XCTAssertEqual(q1.text, "docker")
 
-    // "#" (tek başına) -> tag: "", text: ""
+    // "#" (alone) -> tag: "", text: ""
     let q2 = Search.ParsedQuery(from: "#")
     XCTAssertEqual(q2.tag, "")
     XCTAssertEqual(q2.text, "")
@@ -27,9 +27,9 @@ class SearchTests: XCTestCase {
     XCTAssertNil(q3.tag)
     XCTAssertEqual(q3.text, "docker")
 
-    // Büyük/küçük harf durumu init kısmında dropFirst() ile alınıyor
-    // Arama kısmında lowercased() ile kullanılmıştı.
-    // Parse edilen string doğrudan "#İŞ" -> "İŞ" olmalıdır.
+    // Case sensitivity is handled in the init part with dropFirst().
+    // It was used with lowercased() in the search part.
+    // The parsed string should be directly "#İŞ" -> "İŞ".
     let q4 = Search.ParsedQuery(from: "#İŞ")
     XCTAssertEqual(q4.tag, "İŞ")
     XCTAssertEqual(q4.text, "")

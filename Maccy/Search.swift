@@ -55,11 +55,11 @@ class Search {
   func search(string: String, within: [Searchable]) -> [SearchResult] {
     let parsed = ParsedQuery(from: string)
 
-    // Tag filtrele (sadece pin'ler için anlamlı)
+    // Tag filter (meaningful only for pins)
     let candidates: [Searchable]
     if let tag = parsed.tag {
       if tag.isEmpty {
-        // "#" tek başına → tag'i olan tüm pinler
+        // "#" alone → all pins with any tag
         candidates = within.filter { !$0.tags.isEmpty }
       } else {
         candidates = within.filter { $0.tags.contains(tag.lowercased()) }
@@ -68,7 +68,7 @@ class Search {
       candidates = within
     }
 
-    // Metin araması (boşsa hepsini döndür)
+    // Text search (if empty, return all)
     guard !parsed.text.isEmpty else {
       return candidates.map { SearchResult(object: $0) }
     }
