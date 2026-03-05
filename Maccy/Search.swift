@@ -36,9 +36,9 @@ class Search {
     var text: String
 
     init(from raw: String) {
-      if let match = raw.range(of: #"^\s*#(\S*)(?:\s|$)"#, options: .regularExpression) {
-        let matchedString = raw[match]
-        self.tag = String(matchedString.trimmingCharacters(in: .whitespaces).dropFirst())
+      if let match = raw.range(of: #"^\s*tag:(\S*)(?:\s|$)"#, options: .regularExpression) {
+        let matchedString = raw[match].trimmingCharacters(in: .whitespaces)
+        self.tag = String(matchedString.dropFirst(4)) // drop "tag:" prefix
         self.text = String(raw[match.upperBound...])
       } else {
         self.tag = nil

@@ -118,7 +118,7 @@ struct PinTagView: View {
 
   init(item: HistoryItem) {
     self.item = item
-    self._tagText = State(initialValue: item.tags.map { "#\($0)" }.joined(separator: " "))
+    self._tagText = State(initialValue: item.tags.joined(separator: " "))
   }
 
   var body: some View {
@@ -134,12 +134,12 @@ struct PinTagView: View {
   private func commitTags() {
     let parsed = tagText
       .split(separator: " ")
-      .map { $0.hasPrefix("#") ? String($0.dropFirst()) : String($0) }
+      .map { String($0) }
       .map { $0.lowercased() }
       .filter { !$0.isEmpty }
 
     item.tags = Array(Set(parsed)).sorted()
-    tagText = item.tags.map { "#\($0)" }.joined(separator: " ")
+    tagText = item.tags.joined(separator: " ")
   }
 }
 

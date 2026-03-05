@@ -12,13 +12,13 @@ class SearchTests: XCTestCase {
   }
 
   func testParsedQuery() {
-    // "#kod docker" -> tag: "kod", text: "docker"
-    let q1 = Search.ParsedQuery(from: "#kod docker")
+    // "tag:kod docker" -> tag: "kod", text: "docker"
+    let q1 = Search.ParsedQuery(from: "tag:kod docker")
     XCTAssertEqual(q1.tag, "kod")
     XCTAssertEqual(q1.text, "docker")
 
-    // "#" (alone) -> tag: "", text: ""
-    let q2 = Search.ParsedQuery(from: "#")
+    // "tag:" (alone) -> tag: "", text: ""
+    let q2 = Search.ParsedQuery(from: "tag:")
     XCTAssertEqual(q2.tag, "")
     XCTAssertEqual(q2.text, "")
 
@@ -27,10 +27,10 @@ class SearchTests: XCTestCase {
     XCTAssertNil(q3.tag)
     XCTAssertEqual(q3.text, "docker")
 
-    // Case sensitivity is handled in the init part with dropFirst().
-    // It was used with lowercased() in the search part.
-    // The parsed string should be directly "#İŞ" -> "İŞ".
-    let q4 = Search.ParsedQuery(from: "#İŞ")
+    // Case sensitivity is handled in the init part with dropFirst(4).
+    // It is used with lowercased() in the search part.
+    // The parsed string should be directly "tag:İŞ" -> "İŞ".
+    let q4 = Search.ParsedQuery(from: "tag:İŞ")
     XCTAssertEqual(q4.tag, "İŞ")
     XCTAssertEqual(q4.text, "")
   }
