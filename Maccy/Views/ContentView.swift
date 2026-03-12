@@ -55,6 +55,13 @@ struct ContentView: View {
       .task {
         try? await appState.history.load()
       }
+      .overlay(alignment: .top) {
+        TagInputView()
+          .padding(.top, 40)
+      }
+      .onChange(of: appState.isTagging) { _, isTagging in
+        searchFocused = !isTagging
+      }
     }
     .animation(.easeInOut(duration: 0.2), value: appState.searchVisible)
     .environment(appState)
