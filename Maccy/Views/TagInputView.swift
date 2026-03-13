@@ -3,7 +3,7 @@ import SwiftUI
 struct TagInputView: View {
   @Environment(AppState.self) private var appState
   @FocusState private var isFocused: Bool
-  @State private var autocompleteIndex: Int = 0
+  @State private var autocompleteIndex: Int? = nil
 
   private var suggestions: [String] {
     let query = appState.taggingQuery.lowercased()
@@ -27,8 +27,10 @@ struct TagInputView: View {
           .textFieldStyle(.plain)
           .focused($isFocused)
           .onSubmit {
-            if !suggestions.isEmpty && !appState.taggingQuery.isEmpty {
-              let index = min(max(autocompleteIndex, 0), suggestions.count - 1)
+            if let current = autocompleteIndex,
+               !suggestions.isEmpty,
+               !appState.taggingQuery.isEmpty {
+              let index = min(max(current, 0), suggestions.count - 1)
               appState.taggingQuery = suggestions[index]
             }
             appState.commitTag()
@@ -38,12 +40,22 @@ struct TagInputView: View {
           }
           .onKeyPress(.downArrow) {
             if !suggestions.isEmpty {
-              autocompleteIndex = min(autocompleteIndex + 1, suggestions.count - 1)
+              if let current = autocompleteIndex {
+                autocompleteIndex = min(current + 1, suggestions.count - 1)
+              } else {
+                autocompleteIndex = 0
+              }
             }
             return .handled
           }
           .onKeyPress(.upArrow) {
-            autocompleteIndex = max(autocompleteIndex - 1, 0)
+            if !suggestions.isEmpty {
+              if let current = autocompleteIndex {
+                autocompleteIndex = max(current - 1, 0)
+              } else {
+                autocompleteIndex = suggestions.count - 1
+              }
+            }
             return .handled
           }
         }
@@ -55,12 +67,13 @@ struct TagInputView: View {
           ScrollView {
             VStack(alignment: .leading, spacing: 0) {
               ForEach(Array(suggestions.enumerated()), id: \.element) { index, tag in
-                let clamped = min(max(autocompleteIndex, 0), suggestions.count - 1)
+                let clamped = autocompleteIndex.map { min(max($0, 0), suggestions.count - 1) } ?? -1
+                let isSelected = index == clamped
                 TagChipView(tag: tag)
                   .padding(.horizontal, 8)
                   .padding(.vertical, 3)
                   .frame(maxWidth: .infinity, alignment: .leading)
-                  .background(index == clamped ? Color.accentColor.opacity(0.3) : .clear)
+                  .background(isSelected ? Color.accentColor.opacity(0.3) : .clear)
                   .cornerRadius(4)
                   .onTapGesture {
                     appState.taggingQuery = tag
@@ -78,15 +91,17 @@ struct TagInputView: View {
       .shadow(radius: 4)
       .frame(width: 200)
       .onAppear {
-        autocompleteIndex = 0
+        autocompleteIndex = nil
         Task {
           try? await Task.sleep(for: .milliseconds(150))
           isFocused = true
         }
       }
       .onChange(of: appState.taggingQuery) {
-        autocompleteIndex = 0
+        autocompleteIndex = nil
       }
+    } else {
+      EmptyView()
     }
   }
 }
