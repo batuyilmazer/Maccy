@@ -18,14 +18,29 @@ struct TagAutocompleteView: View {
     let suggestions = self.suggestions
     if !suggestions.isEmpty {
       VStack(alignment: .leading, spacing: 0) {
+        Text("Tags")
+          .font(.system(size: 10, weight: .semibold))
+          .foregroundStyle(.secondary)
+          .padding(.horizontal, 8)
+          .padding(.top, 4)
+
+        Divider()
+          .padding(.vertical, 2)
+
+        let clamped = clampedIndex(in: suggestions)
         ForEach(Array(suggestions.enumerated()), id: \.element) { index, tag in
           TagChipView(tag: tag)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(index == clampedIndex(in: suggestions) ? Color.accentColor.opacity(0.3) : .clear)
+            .background(index == clamped ? Color.accentColor.opacity(0.3) : .clear)
             .cornerRadius(4)
             .onTapGesture { accept(tag) }
+            .onHover { hovering in
+              if hovering {
+                selectedIndex = index
+              }
+            }
         }
       }
       .padding(4)
@@ -33,9 +48,6 @@ struct TagAutocompleteView: View {
       .cornerRadius(6)
       .shadow(radius: 4)
       .frame(maxWidth: 200, alignment: .leading)
-      .onChange(of: query) {
-        selectedIndex = 0
-      }
     }
   }
 

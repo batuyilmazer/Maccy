@@ -65,9 +65,9 @@ struct TagInputView: View {
         if !suggestions.isEmpty {
           Divider()
           ScrollView {
+            let clamped = autocompleteIndex.map { min(max($0, 0), suggestions.count - 1) } ?? -1
             VStack(alignment: .leading, spacing: 0) {
               ForEach(Array(suggestions.enumerated()), id: \.element) { index, tag in
-                let clamped = autocompleteIndex.map { min(max($0, 0), suggestions.count - 1) } ?? -1
                 let isSelected = index == clamped
                 TagChipView(tag: tag)
                   .padding(.horizontal, 8)
@@ -79,11 +79,23 @@ struct TagInputView: View {
                     appState.taggingQuery = tag
                     appState.commitTag()
                   }
+                  .onHover { hovering in
+                    if hovering {
+                      autocompleteIndex = index
+                    }
+                  }
               }
             }
           }
           .frame(maxHeight: 120)
           .padding(.vertical, 2)
+        } else if !appState.taggingQuery.isEmpty {
+          Divider()
+          Text("No matching tags")
+            .font(.system(size: 11))
+            .foregroundStyle(.tertiary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
       }
       .background(.regularMaterial)

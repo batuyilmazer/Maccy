@@ -37,6 +37,24 @@ struct ContentView: View {
               .default.speed(3),
               value: appState.history.pasteStack?.id
             )
+            .overlay(alignment: .topLeading) {
+              TagAutocompleteView(
+                query: $appState.history.searchQuery,
+                allTags: appState.history.allTags,
+                selectedIndex: Bindable(appState).tagAutocompleteIndex
+              )
+              .padding(.horizontal, Popup.horizontalPadding)
+              .onChange(of: appState.history.searchQuery) {
+                let parsed = Search.ParsedQuery(from: appState.history.searchQuery)
+                let hasTagPrefix = parsed.tag != nil
+                let isActivelyTypingTag = hasTagPrefix && parsed.text.isEmpty && !appState.history.searchQuery.hasSuffix(" ")
+                let hasSuggestions = isActivelyTypingTag && !appState.history.allTags.isEmpty
+                appState.tagAutocompleteActive = hasSuggestions
+                if appState.tagAutocompleteIndex != 0 {
+                  appState.tagAutocompleteIndex = 0
+                }
+              }
+            }
             .padding(.horizontal, Popup.horizontalPadding)
             .onAppear {
               searchFocused = true

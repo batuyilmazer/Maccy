@@ -31,20 +31,6 @@ struct ListHeaderView: View {
           // Only reliable way to disable the cursor. allowsHitTesting() does not work
           .offset(y: appState.searchVisible ? 0 : -Popup.itemHeight)
       }
-
-      TagAutocompleteView(
-        query: $searchQuery,
-        allTags: appState.history.allTags,
-        selectedIndex: Bindable(appState).tagAutocompleteIndex
-      )
-      .onChange(of: searchQuery) {
-        let parsed = Search.ParsedQuery(from: searchQuery)
-        let hasTagPrefix = parsed.tag != nil
-        let isActivelyTypingTag = hasTagPrefix && parsed.text.isEmpty && !searchQuery.hasSuffix(" ")
-        let hasSuggestions = isActivelyTypingTag && !appState.history.allTags.isEmpty
-        appState.tagAutocompleteActive = hasSuggestions
-        appState.tagAutocompleteIndex = 0
-      }
     }
   }
 }
